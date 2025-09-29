@@ -1,30 +1,34 @@
-# Multi-stage build for optimized image size
+# Use a base image with Maven and Java 21
 FROM maven:3.9.5-eclipse-temurin-21 AS build
+
+# Set the working directory for the build
 WORKDIR /app
 
-# Copy dependencies first for better caching
+# Copy the pom.xml and dependencies first to leverage Docker cache
 COPY pom.xml .
+
+# Download dependencies
 RUN mvn dependency:go-offline -B
 
-# Copy source and build
+# Copy the entire project
 COPY . .
-RUN mvn clean package -DskipTests
 
-# Runtime stage
-FROM eclipse-temurin:21-jre-jammy
-WORKDIR /app
+# Build the project
+RUN mvn clean install -DskipTests
 
-# Install curl for health checks
-RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+# -------------------------------------------
+# Stage 2: Create a smaller runtime image
+# -------------------------------------------
+FROM eclipse-temurin:21-jdk-jammy
 
-# Copy the JAR file
-COPY --from=build /app/target/contact-server-app-0.0.1-SNAPSHOT.jar app.jar
+# Set the working directory for the application
+WORKDIR /contact-server-app
 
+# Copy the built JAR file from the build stage
+COPY --from=build /app/target/contact-server-app.jar contact-server-app.jar
+
+# Expose the default Spring Boot port
 EXPOSE 8080
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD curl -f http://localhost:8080/actuator/health || exit 1
-
-# Start the application with Spring Boot JAR launcher
-ENTRYPOINT ["java", "-jar", "app.jar"]
+# Set the command to run the application
+ENTRYPOINT ["java", "-jar", "contact-server-app.jar"]
