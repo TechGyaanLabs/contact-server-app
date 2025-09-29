@@ -1,0 +1,8 @@
+CREATE TABLE IF NOT EXISTS contact (
+    id UUID PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    mobile VARCHAR(255) NOT NULL,
+    dob DATE,
+    deleted BOOLEAN DEFAULT FALSE
+);
