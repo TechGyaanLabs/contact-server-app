@@ -1,0 +1,37 @@
+# Maven
+target/
+!target/*.jar
+.mvn/
+mvnw
+mvnw.cmd
+
+# IDE
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+
+# Logs
+*.log
+
+# Documentation
+README.md
+DEPLOYMENT.md
+*.md
+
+# Test files
+src/test/
+
+# Other
+.env
+.env.local
+.env.production
