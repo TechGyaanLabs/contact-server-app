@@ -1,4 +1,4 @@
-# Alternative Dockerfile with explicit main class configuration
+# Multi-stage build for optimized image size
 FROM maven:3.9.5-eclipse-temurin-21 AS build
 WORKDIR /app
 
@@ -26,5 +26,5 @@ EXPOSE 8080
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD curl -f http://localhost:8080/actuator/health || exit 1
 
-# Start the application with explicit main class
-ENTRYPOINT ["java", "-cp", "app.jar", "com.careerit.cbook.ContactServerAppApplication"]
+# Start the application with Spring Boot JAR launcher
+ENTRYPOINT ["java", "-jar", "app.jar"]
